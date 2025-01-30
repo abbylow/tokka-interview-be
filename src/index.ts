@@ -2,7 +2,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import routes from './routes';
-// import { startTransactionListener } from './worker';
+import { startTransactionListener } from './services/transactionListener';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -21,8 +21,12 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 
+
 // Routes
 app.use('/api', routes);
+
+// Start the event listener
+startTransactionListener();
 
 // Start the server
 app.listen(PORT, () => {
