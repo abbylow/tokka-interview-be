@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/transactions', async (req, res) => {
   try {
     // Destructure query and pagination parameters from the request body
-    const { startTime, endTime, txHash, page = 1, limit = 50 } = req.body;
+    const { startTimestamp, endTimestamp, txHash, page = 1, limit = 50 } = req.body;
 
     // Ensure valid numbers for page and limit
     const pageNumber = Number.isNaN(parseInt(page)) ? 1 : Math.max(parseInt(page, 10), 1);
@@ -17,11 +17,12 @@ router.post('/transactions', async (req, res) => {
     const offset = (pageNumber - 1) * pageSize;
 
     // Fetch transactions with the provided parameters
-    // const transactions = await getTransactions(startTime, endTime, txHash, pageSize, offset);
+    // const transactions = await getTransactions(startTimestamp, endTimestamp, txHash, pageSize, offset);
 
     // mock data
     const transactions = [
       {
+        "id": 1,
         "hash": "0x84db524cc750fe4d18a7d5ed5ecb67fd3cf2c183b8d3b0a1ab0dd07c054ce95c",
         "block_number": 1234567,
         "timestamp": "2024-03-05T12:00:00Z",
@@ -33,6 +34,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x3e5fea857b46ca28603a870264a429f115ca2b07051a31e2b4bd4c59f684948e",
         "block_number": 10884836,
         "timestamp": "2024-07-23T21:51:15Z",
@@ -44,6 +46,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x6594602ca3b0a4cf339a9334bcc224292f95fe8925b5049cd5ee84a476359b16",
         "block_number": 1655627,
         "timestamp": "2025-01-15T05:45:30Z",
@@ -55,6 +58,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0xa34696c435dbbb5e3fc2eb42d8069868a4c16e8b67dd24df93031085a70f4089",
         "block_number": 2698128,
         "timestamp": "2024-05-15T16:37:05Z",
@@ -66,6 +70,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x8457e8a3f4e7092e421bc410e62eccfb170b777218ab21ea23281ea94fa3963e",
         "block_number": 1027165,
         "timestamp": "2024-03-26T05:12:06Z",
@@ -77,6 +82,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x84db524cc750fe4d18a7d5ed5ecb67fd3cf2c183b8d3b0a1ab0dd07c054ce95c",
         "block_number": 1234567,
         "timestamp": "2024-03-05T12:00:00Z",
@@ -88,6 +94,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x3e5fea857b46ca28603a870264a429f115ca2b07051a31e2b4bd4c59f684948e",
         "block_number": 10884836,
         "timestamp": "2024-07-23T21:51:15Z",
@@ -99,6 +106,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x6594602ca3b0a4cf339a9334bcc224292f95fe8925b5049cd5ee84a476359b16",
         "block_number": 1655627,
         "timestamp": "2025-01-15T05:45:30Z",
@@ -110,6 +118,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0xa34696c435dbbb5e3fc2eb42d8069868a4c16e8b67dd24df93031085a70f4089",
         "block_number": 2698128,
         "timestamp": "2024-05-15T16:37:05Z",
@@ -121,6 +130,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x8457e8a3f4e7092e421bc410e62eccfb170b777218ab21ea23281ea94fa3963e",
         "block_number": 1027165,
         "timestamp": "2024-03-26T05:12:06Z",
@@ -132,6 +142,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x84db524cc750fe4d18a7d5ed5ecb67fd3cf2c183b8d3b0a1ab0dd07c054ce95c",
         "block_number": 1234567,
         "timestamp": "2024-03-05T12:00:00Z",
@@ -143,6 +154,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x3e5fea857b46ca28603a870264a429f115ca2b07051a31e2b4bd4c59f684948e",
         "block_number": 10884836,
         "timestamp": "2024-07-23T21:51:15Z",
@@ -154,6 +166,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x6594602ca3b0a4cf339a9334bcc224292f95fe8925b5049cd5ee84a476359b16",
         "block_number": 1655627,
         "timestamp": "2025-01-15T05:45:30Z",
@@ -165,6 +178,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0xa34696c435dbbb5e3fc2eb42d8069868a4c16e8b67dd24df93031085a70f4089",
         "block_number": 2698128,
         "timestamp": "2024-05-15T16:37:05Z",
@@ -176,6 +190,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x8457e8a3f4e7092e421bc410e62eccfb170b777218ab21ea23281ea94fa3963e",
         "block_number": 1027165,
         "timestamp": "2024-03-26T05:12:06Z",
@@ -187,6 +202,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x84db524cc750fe4d18a7d5ed5ecb67fd3cf2c183b8d3b0a1ab0dd07c054ce95c",
         "block_number": 1234567,
         "timestamp": "2024-03-05T12:00:00Z",
@@ -198,6 +214,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x3e5fea857b46ca28603a870264a429f115ca2b07051a31e2b4bd4c59f684948e",
         "block_number": 10884836,
         "timestamp": "2024-07-23T21:51:15Z",
@@ -209,6 +226,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x6594602ca3b0a4cf339a9334bcc224292f95fe8925b5049cd5ee84a476359b16",
         "block_number": 1655627,
         "timestamp": "2025-01-15T05:45:30Z",
@@ -220,6 +238,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0xa34696c435dbbb5e3fc2eb42d8069868a4c16e8b67dd24df93031085a70f4089",
         "block_number": 2698128,
         "timestamp": "2024-05-15T16:37:05Z",
@@ -231,6 +250,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x8457e8a3f4e7092e421bc410e62eccfb170b777218ab21ea23281ea94fa3963e",
         "block_number": 1027165,
         "timestamp": "2024-03-26T05:12:06Z",
@@ -242,6 +262,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x84db524cc750fe4d18a7d5ed5ecb67fd3cf2c183b8d3b0a1ab0dd07c054ce95c",
         "block_number": 1234567,
         "timestamp": "2024-03-05T12:00:00Z",
@@ -253,6 +274,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x3e5fea857b46ca28603a870264a429f115ca2b07051a31e2b4bd4c59f684948e",
         "block_number": 10884836,
         "timestamp": "2024-07-23T21:51:15Z",
@@ -264,6 +286,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x6594602ca3b0a4cf339a9334bcc224292f95fe8925b5049cd5ee84a476359b16",
         "block_number": 1655627,
         "timestamp": "2025-01-15T05:45:30Z",
@@ -275,6 +298,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0xa34696c435dbbb5e3fc2eb42d8069868a4c16e8b67dd24df93031085a70f4089",
         "block_number": 2698128,
         "timestamp": "2024-05-15T16:37:05Z",
@@ -286,6 +310,7 @@ router.post('/transactions', async (req, res) => {
         "processed_at": "2025-01-30T12:36:26.000000"
       },
       {
+        "id": 1,
         "hash": "0x8457e8a3f4e7092e421bc410e62eccfb170b777218ab21ea23281ea94fa3963e",
         "block_number": 1027165,
         "timestamp": "2024-03-26T05:12:06Z",
@@ -299,10 +324,10 @@ router.post('/transactions', async (req, res) => {
     ]
 
     res.json({
-      page: pageNumber,
-      limit: pageSize,
-      total: transactions.length,
-      data: transactions,
+      currentPage: pageNumber,
+      pageSize: pageSize,
+      totalCount: transactions.length,
+      transactions: transactions,
     });
   } catch (error) {
     console.error('Error fetching transactions:', error);
