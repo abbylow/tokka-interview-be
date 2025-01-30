@@ -58,7 +58,7 @@ export async function syncTransactions(startBlock: number, endBlock: number): Pr
         // console.log('Publishing transaction:', transactionData);
 
         // Publish message to the queue
-        // await transactionQueue.add('record-transaction', transactionData);
+        await transactionQueue.add('record-transaction', transactionData);
       }
 
       totalSynced += transactions.length;

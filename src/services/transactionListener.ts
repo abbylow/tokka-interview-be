@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-// import transactionQueue from '../queues/transactionQueue';
+import transactionQueue from '../queues/transactionQueue';
 
 console.log(process.env.INFURA_API_KEY)
 export function startTransactionListener() {
@@ -75,8 +75,8 @@ export function startTransactionListener() {
 
       console.log('Transaction Data:', transactionData);
 
-      // Add transaction data to BullMQ (commented out for now)
-      // await transactionQueue.add('record-transaction', transactionData);
+      // Add transaction data to BullMQ
+      await transactionQueue.add('record-transaction', transactionData);
 
     } catch (error) {
       console.error('Error processing swap event:', error);
