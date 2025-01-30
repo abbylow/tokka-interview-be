@@ -1,18 +1,22 @@
 import cors from 'cors';
+import dotenv from 'dotenv';
 import express from 'express';
 import routes from './routes';
 // import { startTransactionListener } from './worker';
 
+// Load environment variables from .env file
+dotenv.config();
+
 const app = express();
+
+const PORT = process.env.PORT || 4242;
+const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
 
 // enable CORS with specific options (optional)
 app.use(cors({
-  origin: process.env.ALLOWED_FRONTEND_URL,  // Allow requests only from this origin
-  methods: 'GET,POST,PUT,DELETE',   // Allowed HTTP methods
-  allowedHeaders: 'Content-Type,Authorization'  // Allowed request headers
+  origin: allowedOrigin,  // Allow requests only from this origin
 }));
 
-const PORT = process.env.PORT || 4242;
 
 // Middleware
 app.use(express.json());
