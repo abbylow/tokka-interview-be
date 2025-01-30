@@ -1,13 +1,5 @@
-import fetch from 'node-fetch';
 import { EtherscanResponse } from '../types/etherscan';
-// import { Queue } from 'bullmq';
-
-// const transactionQueue = new Queue('transaction-queue', {
-//   connection: {
-//     host: 'localhost',
-//     port: 6379
-//   }
-// });
+import transactionQueue from '../queues/transactionQueue';
 
 const numOfItemsPerBatch = 10000;
 
@@ -25,6 +17,7 @@ async function fetchTokenTransactions(startBlock: number, endBlock: number) {
 
   const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${poolAddress}&page=1&offset=${numOfItemsPerBatch}&startblock=${startBlock}&endblock=${endBlock}&sort=asc&apikey=${etherscanApi}`;
   console.log(url)
+  const fetch = (await import('node-fetch')).default;
   const response = await fetch(url);
   const data = await response.json() as EtherscanResponse;
 
