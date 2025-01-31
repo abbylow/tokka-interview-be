@@ -3,6 +3,28 @@ import transactionQueue from '../queues/transactionQueue';
 
 const numOfItemsPerBatch = 10000;
 
+interface TransactionData {
+  hash: string;           // Transaction hash
+  block_number: number;   // Block number where the transaction was mined
+  timestamp: number;      // Unix timestamp of the block
+  gas_used: string;       // Gas used by the transaction (as string to handle large values)
+  gas_price?: string;     // Gas price in wei (optional, as it may be undefined)
+};
+
+function filterUniqueTransactions(transactions: TransactionData[]) {
+  const uniqueTransactions = [];
+  const seenHashes = new Set();
+
+  for (const txn of transactions) {
+    if (!seenHashes.has(txn.hash)) {
+      uniqueTransactions.push(txn);
+      seenHashes.add(txn.hash);
+    }
+  }
+
+  return uniqueTransactions;
+}
+
 // Fetch token transactions from Etherscan API
 async function fetchTokenTransactions(startBlock: number, endBlock: number) {
   const poolAddress = process.env.UNISWAP_POOL_ADDRESS;
@@ -45,20 +67,23 @@ export async function syncTransactions(startBlock: number, endBlock: number): Pr
         break;
       }
 
-      // Process transactions
-      for (const tx of transactions) {
-        const transactionData = {
+      // Process tx and filter if the same hash if the same
+      const processedTxns = transactions.map(tx => {
+        return {
           hash: tx.hash,
           block_number: parseInt(tx.blockNumber, 10),
           timestamp: parseInt(tx.timeStamp, 10),
           gas_used: tx.gasUsed,
           gas_price: tx.gasPrice
-        };
+        }
+      })
+      const filteredTxns = filterUniqueTransactions(processedTxns);
 
-        // console.log('Publishing transaction:', transactionData);
+      for (const tx of filteredTxns) {
+        // console.log('Publishing transaction:', tx);
 
         // Publish message to the queue
-        await transactionQueue.add('record-transaction', transactionData);
+        await transactionQueue.add('record-transaction', tx);
       }
 
       totalSynced += transactions.length;
