@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { EtherscanResponse } from '../types/etherscan';
-import transactionQueue from '../queues/transactionQueue';
+import transactionQueue, { recordTxJobName } from '../queues/transactionQueue';
 
 const numOfItemsPerBatch = 10000;
 
@@ -83,7 +83,7 @@ export async function syncTransactions(startBlock: number, endBlock: number): Pr
         // console.log('Publishing transaction:', tx);
 
         // Publish message to the queue
-        await transactionQueue.add('record-transaction', tx);
+        await transactionQueue.add(recordTxJobName, tx);
       }
 
       totalSynced += transactions.length;

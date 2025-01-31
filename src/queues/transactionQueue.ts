@@ -1,5 +1,7 @@
 import { Queue } from 'bullmq';
 
+export const recordTxJobName = 'record-transaction';
+
 export const txQueueName = 'transaction-queue';
 
 const transactionQueue = new Queue(txQueueName, {

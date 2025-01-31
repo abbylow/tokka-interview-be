@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import transactionQueue from '../queues/transactionQueue';
+import transactionQueue, { recordTxJobName } from '../queues/transactionQueue';
 
 export function startTransactionListener() {
   console.log('Event listener is running...');
@@ -75,7 +75,7 @@ export function startTransactionListener() {
       console.log('Transaction Data:', transactionData);
 
       // Add transaction data to BullMQ
-      await transactionQueue.add('record-transaction', transactionData);
+      await transactionQueue.add(recordTxJobName, transactionData);
 
     } catch (error) {
       console.error('Error processing swap event:', error);
