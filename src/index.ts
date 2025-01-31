@@ -13,24 +13,24 @@ const app = express();
 const PORT = process.env.PORT || 4242;
 const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
 
-// enable CORS with specific options (optional)
+// Enable CORS with specific options
 app.use(cors({
-  origin: allowedOrigin,  // Allow requests only from this origin
+  origin: allowedOrigin,  // Allow requests only from the defined origin
 }));
 
-// Middleware
+// Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Routes
+// Register API routes under the /api prefix
 app.use('/api', routes);
 
-// Start the event listener
+// Start the transaction listener
 startTransactionListener();
 
-// Start the worker within the Express app process
+// Start the worker process
 transactionWorker;  
 
-// Start the server
+// Start the Express server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
