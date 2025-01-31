@@ -89,7 +89,7 @@ export const transactionWorker = new Worker(
   },
   {
     connection,
-    concurrency: 1,               // Number of concurrent jobs the worker can process at the same time
+    concurrency: 5,               // Number of concurrent jobs the worker can process at the same time
     maxStalledCount: 3,           // Maximum number of times a job can stall before being marked as failed
     stalledInterval: 30000,       // Interval (in ms) to check for stalled jobs (30 seconds)
   }
