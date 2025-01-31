@@ -9,7 +9,7 @@ const redisCache = new Redis(redisCacheConfig);
 
 const connection = {
   ...redisQueueConfig,
-  retryStrategy: (times: number) => Math.min(times * 50, 2000),
+  retryStrategy: (times: number) => Math.min((Math.random() + 1) * 2 ** times * 100, 30000), // Max 30 seconds; exponential backoff with jitter - prevent retries from occurring in sync
 };
 
 const symbol = "ETHUSDT"
