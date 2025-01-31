@@ -75,7 +75,13 @@ export function startTransactionListener() {
       console.log('Transaction Data:', transactionData);
 
       // Add transaction data to BullMQ
-      await transactionQueue.add(recordTxJobName, transactionData);
+      await transactionQueue.add(recordTxJobName, transactionData, {
+        attempts: 5,         // Retry up to 5 times if the task fails
+        backoff: {
+          type: 'exponential',  // Use exponential backoff between retries
+          delay: 5000,          // Start with a 5-second delay
+        },
+      });
 
     } catch (error) {
       console.error('Error processing swap event:', error);

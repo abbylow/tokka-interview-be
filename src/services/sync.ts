@@ -83,7 +83,13 @@ export async function syncTransactions(startBlock: number, endBlock: number): Pr
         // console.log('Publishing transaction:', tx);
 
         // Publish message to the queue
-        await transactionQueue.add(recordTxJobName, tx);
+        await transactionQueue.add(recordTxJobName, tx, {
+          attempts: 5,         // Retry up to 5 times if the task fails
+          backoff: {
+            type: 'exponential',  // Use exponential backoff between retries
+            delay: 5000,          // Start with a 5-second delay
+          },
+        });
       }
 
       totalSynced += transactions.length;
