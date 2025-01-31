@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 import transactionQueue from '../queues/transactionQueue';
 
-console.log(process.env.INFURA_API_KEY)
 export function startTransactionListener() {
   console.log('Event listener is running...');
 

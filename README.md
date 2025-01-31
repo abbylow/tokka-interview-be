@@ -27,7 +27,8 @@ SELECT COUNT(*) FROM transactions;
 
 Check if Redis is running:
 ```
-docker exec -it redis redis-cli
+docker exec -it redis-cache redis-cli
+docker exec -it redis-queue redis-cli
 ```
 Test the Redis: 
 ```

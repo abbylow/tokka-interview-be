@@ -1,4 +1,15 @@
 services:
+  frontend:
+    image: frontend-app:local # Use the local image tag
+    container_name: frontend-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BACKEND_URL=http://express-app:4242
+    depends_on:
+      - express-app
+
   express-app:
     build: .
     container_name: express-app
@@ -7,15 +18,19 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4242
-      - DATABASE_URL=postgres://postgres:password@postgres:5432/mydatabase
-      - REDIS_URL=redis://redis:6379
-      - ETHERSCAN_API_KEY=${ETHERSCAN_API_KEY}
+      - ALLOWED_FRONTEND_URL=${ALLOWED_FRONTEND_URL}
       - INFURA_API_KEY=${INFURA_API_KEY}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - UNISWAP_POOL_ADDRESS=${UNISWAP_POOL_ADDRESS}
+      - ETHERSCAN_API_KEY=${ETHERSCAN_API_KEY}
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/mydatabase
+      - REDIS_QUEUE_HOST=redis-queue
+      - REDIS_QUEUE_PORT=6379
+      - REDIS_CACHE_HOST=redis-cache
+      - REDIS_CACHE_PORT=6379
     depends_on:
       - postgres
-      - redis
+      - redis-queue
+      - redis-cache
 
   postgres:
     image: postgres:15
@@ -30,11 +45,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
-  redis:
+  redis-queue:
     image: redis:7
-    container_name: redis
+    container_name: redis-queue
     ports:
       - "6379:6379"
+
+  redis-cache:
+    image: redis:7
+    container_name: redis-cache
+    ports:
+      - "6380:6379"
+    command: [ "redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru" ]
 
 volumes:
   postgres_data:
