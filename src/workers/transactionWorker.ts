@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import fetch from 'node-fetch';
 import { pool } from '../db';
 import { redisQueueConfig, redisCacheConfig } from '../redis';
+import { txQueueName } from '../queues/transactionQueue';
 
 const redisCache = new Redis(redisCacheConfig);
 
@@ -14,7 +15,7 @@ const connection = {
 const symbol = "ETHUSDT"
 
 export const transactionWorker = new Worker(
-  'transaction-queue',
+  txQueueName,
   async job => {
     try {
       const transaction = job.data;

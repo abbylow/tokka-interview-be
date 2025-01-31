@@ -18,10 +18,8 @@ app.use(cors({
   origin: allowedOrigin,  // Allow requests only from this origin
 }));
 
-
 // Middleware
 app.use(express.json());
-
 
 // Routes
 app.use('/api', routes);
