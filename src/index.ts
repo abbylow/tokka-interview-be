@@ -2,7 +2,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import routes from './routes';
-// import { startTransactionListener } from './services/transactionListener';
+import { startTransactionListener } from './services/transactionListener';
 import { transactionWorker } from './workers/transactionWorker';
 
 // Load environment variables from .env file
@@ -27,7 +27,7 @@ app.use(express.json());
 app.use('/api', routes);
 
 // Start the event listener
-// startTransactionListener();
+startTransactionListener();
 
 // Start the worker within the Express app process
 transactionWorker;  
