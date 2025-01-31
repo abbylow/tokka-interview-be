@@ -1,7 +1,7 @@
 import express from 'express';
 import { ethers } from 'ethers';
 import { syncTransactions } from './services/sync';
-import { getTransactions } from './services/transaction';
+import { getTransactions, getTransactionSummary } from './services/transactions';
 
 const router = express.Router();
 
@@ -38,6 +38,23 @@ router.post('/transactions', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching transactions:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// POST /transactions-summary
+router.post('/transactions-summary', async (req, res) => {
+  try {
+    // Call the service function to get the transaction summary
+    const { total_eth_fee, total_usdt_fee } = await getTransactionSummary();
+
+    // Send the response
+    res.json({
+      totalEthFee: total_eth_fee,
+      totalUsdtFee: total_usdt_fee,
+    });
+  } catch (error) {
+    console.error('Error fetching transactions summary:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
