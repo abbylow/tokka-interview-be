@@ -1,34 +1,12 @@
-import cors from 'cors';
-import dotenv from 'dotenv';
-import express from 'express';
-import routes from './routes';
-import { startTransactionListener } from './services/transactionListener';
-import { transactionWorker } from './workers/transactionWorker';
-
-// Load environment variables from .env file
-dotenv.config();
-
-const app = express();
+import { app } from "./app";
+import { initServices } from "./services/initServices";
 
 const PORT = process.env.PORT || 4242;
-const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
 
-// Enable CORS with specified options
-app.use(cors({
-  origin: allowedOrigin,  // Allow requests only from the defined origin
-}));
-
-// Middleware to parse JSON request bodies
-app.use(express.json());
-
-// Register API routes under the /api prefix
-app.use('/api', routes);
-
-// Start the transaction listener (for blockchain events)
-startTransactionListener();
-
-// Start the transaction worker process
-transactionWorker;
+// Conditionally initialize services only if not testing
+if (process.env.NODE_ENV !== 'test') {
+  initServices();
+}
 
 // Start the Express server
 app.listen(PORT, () => {
