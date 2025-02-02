@@ -6,3 +6,6 @@
 
 # built files
 /dist
+
+# testing related
+coverage
