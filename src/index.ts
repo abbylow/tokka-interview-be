@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 4242;
 const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
 
-// Enable CORS with specific options
+// Enable CORS with specified options
 app.use(cors({
   origin: allowedOrigin,  // Allow requests only from the defined origin
 }));
@@ -24,11 +24,11 @@ app.use(express.json());
 // Register API routes under the /api prefix
 app.use('/api', routes);
 
-// Start the transaction listener
+// Start the transaction listener (for blockchain events)
 startTransactionListener();
 
-// Start the worker process
-transactionWorker;  
+// Start the transaction worker process
+transactionWorker;
 
 // Start the Express server
 app.listen(PORT, () => {

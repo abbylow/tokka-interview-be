@@ -1,6 +1,10 @@
 import { ethers } from 'ethers';
 import transactionQueue, { recordTxJobName } from '../queues/transactionQueue';
 
+/**
+ * Starts the transaction event listener.
+ * Listens for Swap events on the Uniswap pool and publishes transactions to the queue.
+ */
 export function startTransactionListener() {
   console.log('Event listener is running...');
 
@@ -15,80 +19,69 @@ export function startTransactionListener() {
     process.exit(1);
   }
 
+  // Initialize Ethereum provider and contract instance
   const provider = new ethers.JsonRpcProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
-
   const poolABI = [
     {
-      "anonymous": false,
-      "inputs": [
-        { "indexed": true, "internalType": "address", "name": "sender", "type": "address" },
-        { "indexed": true, "internalType": "address", "name": "recipient", "type": "address" },
-        { "indexed": false, "internalType": "int256", "name": "amount0", "type": "int256" },
-        { "indexed": false, "internalType": "int256", "name": "amount1", "type": "int256" },
-        { "indexed": false, "internalType": "uint160", "name": "sqrtPriceX96", "type": "uint160" },
-        { "indexed": false, "internalType": "uint128", "name": "liquidity", "type": "uint128" },
-        { "indexed": false, "internalType": "int24", "name": "tick", "type": "int24" }
+      name: "Swap",
+      type: "event",
+      inputs: [
+        { indexed: true, name: "sender", type: "address" },
+        { indexed: true, name: "recipient", type: "address" },
+        { indexed: false, name: "amount0", type: "int256" },
+        { indexed: false, name: "amount1", type: "int256" },
+        { indexed: false, name: "sqrtPriceX96", type: "uint160" },
+        { indexed: false, name: "liquidity", type: "uint128" },
+        { indexed: false, name: "tick", type: "int24" },
       ],
-      "name": "Swap",
-      "type": "event"
-    }
+    },
   ];
 
   const contract = new ethers.Contract(poolAddress, poolABI, provider);
 
+  // Listen for Swap events and process each transaction
   contract.on('Swap', async (sender, recipient, amount0, amount1, sqrtPriceX96, liquidity, tick, event) => {
-
     try {
-      console.log(`Swap event detected! Event tx hash: ${event.log}`);
-      // Fetch transaction details
-      const txHash = event.log.transactionHash;
+      const txHash = event?.log?.transactionHash;
 
       if (!txHash) {
         console.error('Transaction hash is undefined.');
         return;
       }
+      
+      console.log(`Swap event detected! Event tx hash: ${txHash}`);
 
-      console.log(`Fetching transaction details for hash: ${txHash}`);
+      // Fetch transaction details from the blockchain
       const txReceipt = await provider.getTransactionReceipt(txHash);
-
       if (!txReceipt) {
         console.error(`Failed to get transaction receipt for hash: ${txHash}`);
         return;
       }
 
-      // Get block details
       const block = await provider.getBlock(txReceipt.blockNumber);
       if (!block) {
         console.error(`Failed to get block details for block number: ${txReceipt.blockNumber}`);
         return;
       }
 
-      // Prepare transaction data
+      // Prepare transaction data and add to the queue
       const transactionData = {
         hash: txReceipt.hash,
         block_number: txReceipt.blockNumber,
-        timestamp: block.timestamp,                 // Unix timestamp of the block
-        gas_used: txReceipt.gasUsed.toString(),      // Gas used
-        gas_price: txReceipt.gasPrice?.toString()  //  Gas price in wei
+        timestamp: block.timestamp,
+        gas_used: txReceipt.gasUsed.toString(),
+        gas_price: txReceipt.gasPrice?.toString(),
       };
 
       console.log('Transaction Data:', transactionData);
-
-      // Add transaction data to BullMQ
       await transactionQueue.add(recordTxJobName, transactionData, {
-        attempts: 5,         // Retry up to 5 times if the task fails
-        backoff: {
-          type: 'exponential',  // Use exponential backoff between retries
-          delay: 5000,          // Start with a 5-second delay
-        },
+        attempts: 5,
+        backoff: { type: 'exponential', delay: 5000 },
       });
-
     } catch (error) {
       console.error('Error processing swap event:', error);
     }
-
   });
 
   console.log('Listening for swap events...');
-
 }

@@ -2,16 +2,31 @@ import fetch from 'node-fetch';
 import { EtherscanResponse } from '../types/etherscan';
 import transactionQueue, { recordTxJobName } from '../queues/transactionQueue';
 
+// Number of items to fetch per batch from the Etherscan API (max: 10k)
 const numOfItemsPerBatch = 10000;
 
+/**
+ * Interface defining the structure of a transaction
+ * hash: transaction hash
+ * block_number: block number where the transaction was mined
+ * timestamp: Unix timestamp of the block
+ * gas_used: gas used by the transaction
+ * gas_price: gas price in wei
+ * 
+ */
 interface TransactionData {
-  hash: string;           // Transaction hash
-  block_number: number;   // Block number where the transaction was mined
-  timestamp: number;      // Unix timestamp of the block
-  gas_used: string;       // Gas used by the transaction (as string to handle large values)
-  gas_price?: string;     // Gas price in wei (optional, as it may be undefined)
-};
+  hash: string;
+  block_number: number;
+  timestamp: number;
+  gas_used: string;
+  gas_price: string;
+}
 
+/**
+ * Filters out duplicate transactions by hash.
+ * @param transactions Array of transaction data
+ * @returns An array of unique transactions
+ */
 function filterUniqueTransactions(transactions: TransactionData[]) {
   const uniqueTransactions = [];
   const seenHashes = new Set();
@@ -26,23 +41,27 @@ function filterUniqueTransactions(transactions: TransactionData[]) {
   return uniqueTransactions;
 }
 
-// Fetch token transactions from Etherscan API
-async function fetchTokenTransactions(startBlock: number, endBlock: number) {
-  const poolAddress = process.env.UNISWAP_POOL_ADDRESS;
-  if (!poolAddress) {
-    throw ('UNISWAP_POOL_ADDRESS is not defined.');
-  }
+/**
+ * Fetches token transactions from the Etherscan API within a block range.
+ * @param poolAddress Pool smart contract address
+ * @param startBlock Starting block number
+ * @param endBlock Ending block number
+ * @returns Array of transaction data from Etherscan
+ */
+async function fetchTokenTransactions(poolAddress: string, startBlock: number, endBlock: number) {
 
   const etherscanApi = process.env.ETHERSCAN_API_KEY;
-  if (!etherscanApi) {
-    throw ('ETHERSCAN_API_KEY is not defined.');
-  }
+  if (!etherscanApi) throw new Error('ETHERSCAN_API_KEY is not defined.');
+
 
   const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${poolAddress}&page=1&offset=${numOfItemsPerBatch}&startblock=${startBlock}&endblock=${endBlock}&sort=asc&apikey=${etherscanApi}`;
-  console.log(url)
+  console.log("Fetch txns from Etherscan: ", url);
+
+  // Fetch data from the API
   const response = await fetch(url);
   const data = await response.json() as EtherscanResponse;
 
+  // Handle API errors
   if (data.status !== '1') {
     throw new Error(`Etherscan API error: ${data.message}`);
   }
@@ -50,8 +69,14 @@ async function fetchTokenTransactions(startBlock: number, endBlock: number) {
   return data.result;
 }
 
-// Sync transactions between block range
-export async function syncTransactions(startBlock: number, endBlock: number): Promise<number> {
+/**
+ * Synchronizes transactions within a specified block range.
+ * @param poolAddress Pool smart contract address
+ * @param startBlock Starting block number
+ * @param endBlock Ending block number
+ * @returns The total number of synchronized transactions
+ */
+export async function syncTransactions(poolAddress: string, startBlock: number, endBlock: number): Promise<number> {
   let currentStartBlock = startBlock;
   let totalSynced = 0;
 
@@ -59,52 +84,48 @@ export async function syncTransactions(startBlock: number, endBlock: number): Pr
     while (true) {
       console.log(`Fetching transactions from block ${currentStartBlock} to ${endBlock}...`);
 
-      // Fetch transactions
-      const transactions = await fetchTokenTransactions(currentStartBlock, endBlock);
+      // Fetch transactions from Etherscan
+      const transactions = await fetchTokenTransactions(poolAddress, currentStartBlock, endBlock);
 
+      // Exit loop if no more transactions
       if (transactions.length === 0) {
         console.log('No more transactions found.');
         break;
       }
 
-      // Process tx and filter if the same hash if the same
-      const processedTxns = transactions.map(tx => {
-        return {
-          hash: tx.hash,
-          block_number: parseInt(tx.blockNumber, 10),
-          timestamp: parseInt(tx.timeStamp, 10),
-          gas_used: tx.gasUsed,
-          gas_price: tx.gasPrice
-        }
-      })
+      // Map and filter transactions to remove duplicates
+      const processedTxns = transactions.map(tx => ({
+        hash: tx.hash,
+        block_number: parseInt(tx.blockNumber, 10),
+        timestamp: parseInt(tx.timeStamp, 10),
+        gas_used: tx.gasUsed,
+        gas_price: tx.gasPrice,
+      }));
       const filteredTxns = filterUniqueTransactions(processedTxns);
 
+      // Add each transaction to the queue
       for (const tx of filteredTxns) {
-        // console.log('Publishing transaction:', tx);
-
-        // Publish message to the queue
         await transactionQueue.add(recordTxJobName, tx, {
-          attempts: 5,         // Retry up to 5 times if the task fails
+          attempts: 5,         // Retry up to 5 times on failure
           backoff: {
-            type: 'exponential',  // Use exponential backoff between retries
-            delay: 5000,          // Start with a 5-second delay
+            type: 'exponential',  // Exponential backoff between retries
+            delay: 5000,          // Initial delay of 5 seconds
           },
         });
       }
 
       totalSynced += transactions.length;
 
-      // Check if more data might exist
-      if (transactions.length < numOfItemsPerBatch) {
-        break;  // No more data to fetch
-      }
+      // Stop fetching if fewer items than the batch size are returned
+      if (transactions.length < numOfItemsPerBatch) break;
 
-      // Update currentStartBlock to the last transaction's block number
+      // Update start block for the next batch
       currentStartBlock = parseInt(transactions[transactions.length - 1].blockNumber, 10) + 1;
     }
   } catch (error) {
-    console.error('Error fetch historical transactions:', error);
+    console.error('Error syncing transactions:', error);
   }
+
   console.log(`Sync complete. Total transactions synced: ${totalSynced} and ended at block: ${currentStartBlock}`);
   return totalSynced;
 }

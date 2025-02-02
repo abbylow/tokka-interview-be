@@ -177,11 +177,14 @@ router.post('/sync', async (req, res) => {
       throw new Error('INFURA_API_KEY is not defined.');
     }
 
+    const poolAddress = process.env.UNISWAP_POOL_ADDRESS;
+    if (!poolAddress) throw new Error('UNISWAP_POOL_ADDRESS is not defined.');
+
     const provider = new ethers.JsonRpcProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
     const startBlockParam = startBlock ? parseInt(startBlock, 10) : 0;
     const endBlockParam = endBlock ? parseInt(endBlock, 10) : await provider.getBlockNumber();
 
-    const totalTransactions = await syncTransactions(startBlockParam, endBlockParam);
+    const totalTransactions = await syncTransactions(poolAddress, startBlockParam, endBlockParam);
     res.json({ message: 'Transactions synced successfully', total: totalTransactions });
   } catch (error) {
     console.error('Error syncing transactions:', error);
