@@ -48,7 +48,7 @@ function filterUniqueTransactions(transactions: TransactionData[]) {
  * @param endBlock Ending block number
  * @returns Array of transaction data from Etherscan
  */
-async function fetchTokenTransactions(poolAddress: string, startBlock: number, endBlock: number) {
+export async function fetchTokenTransactions(poolAddress: string, startBlock: number, endBlock: number) {
 
   const etherscanApi = process.env.ETHERSCAN_API_KEY;
   if (!etherscanApi) throw new Error('ETHERSCAN_API_KEY is not defined.');
