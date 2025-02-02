@@ -37,7 +37,7 @@ export const transactionWorker = new Worker(
         console.log('Fetching ETH price from Binance API...');
         
         // Fetch price data from Binance API
-        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1s&limit=1`);
+        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1s&limit=1&startTime=${transaction.timestamp * 1000}&endTime=${transaction.timestamp * 1000}`);
 
         // Handle API rate limit errors
         if (response.status === 429) {
