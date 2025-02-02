@@ -120,7 +120,7 @@ export async function syncTransactions(poolAddress: string, startBlock: number, 
       if (transactions.length < numOfItemsPerBatch) break;
 
       // Update start block for the next batch
-      currentStartBlock = parseInt(transactions[transactions.length - 1].blockNumber, 10) + 1;
+      currentStartBlock = parseInt(transactions[transactions.length - 1].blockNumber, 10);
     }
   } catch (error) {
     console.error('Error syncing transactions:', error);
