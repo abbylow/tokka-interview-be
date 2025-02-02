@@ -43,19 +43,6 @@ Syncs transactions within a specified block range.
 3. Set Up Environment Variables
     Create a .env.local file in the root directory and add the required environment variables. Refer to .env.example for guidance.
 
-## Testing
-Run unit tests with:
-
-```
-npm test
-```
-
-To run tests with coverage reporting:
-
-```
-npm run test:coverage
-```
-
 ## Build and Run Instructions (with Docker)
 This section provides instructions on how to build, run, and test the backend using Docker.
 
@@ -144,6 +131,19 @@ You can also stop and remove all containers using:
 
 ```
 docker-compose down
+```
+
+## Testing
+Run unit tests with:
+
+```
+npm test
+```
+
+To run tests with coverage reporting:
+
+```
+npm run test:coverage
 ```
 
 ## Potential Improvements and Enhancements
